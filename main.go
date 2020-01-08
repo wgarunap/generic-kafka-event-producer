@@ -77,6 +77,7 @@ func main() {
 
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
+	config.Version = sarama.V2_2_0_0
 
 	Producer, err = sarama.NewSyncProducer([]string{`localhost:9092`}, config)
 	if err != nil {
@@ -92,11 +93,12 @@ func main() {
 }
 
 type Event struct {
-	Subject string      `json:"subject"`
-	Version int         `json:"version"`
-	Topic   string      `json:"topic"`
-	Value   interface{} `json:"value"`
-	Key     string      `json:"key"`
+	Subject string            `json:"subject"`
+	Version int               `json:"version"`
+	Topic   string            `json:"topic"`
+	Key     string            `json:"key"`
+	Headers map[string]string `json:"headers"`
+	Value   interface{}       `json:"value"`
 }
 
 func publish(w http.ResponseWriter, r *http.Request) {
@@ -137,6 +139,7 @@ func publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//encode value
 	encodedValue, err := Registry.WithSchema(e.Subject, e.Version).Encode(e.Value)
 	if err != nil {
 		w.WriteHeader(400)
@@ -144,16 +147,28 @@ func publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//create headers
+	var headers []sarama.RecordHeader
+	for s, s2 := range e.Headers {
+		headers = append(headers, sarama.RecordHeader{
+			Key:   []byte(s),
+			Value: []byte(s2),
+		})
+	}
+
 	p, o, err := Producer.SendMessage(&sarama.ProducerMessage{
 		Topic:     e.Topic,
 		Key:       sarama.ByteEncoder([]byte(e.Key)),
 		Value:     sarama.ByteEncoder(encodedValue),
+		Headers:   headers,
 		Timestamp: time.Now(),
 	})
 
+	if err!=nil{
+		log.Error(err)
+	}
 
-	w.Header().Set("Content-Type","application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write([]byte(fmt.Sprintf(`{"partition":%d, "offset":%d}`, p, o)))
-
 }
