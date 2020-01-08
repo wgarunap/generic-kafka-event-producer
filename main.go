@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/gorilla/mux"
@@ -10,6 +11,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+)
+
+const (
+	FormatAvro = "avro"
+	FormatJson = "json"
 )
 
 type subjects []string
@@ -86,8 +92,8 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/publish", publish).Methods(http.MethodPost)
 
-	log.Info("serving now... localhost:8000")
-	http.ListenAndServe(`:8000`, router)
+	log.Info("serving now... localhost:8040")
+	http.ListenAndServe(`:8041`, router)
 
 }
 
@@ -97,6 +103,7 @@ type Event struct {
 	Topic   string      `json:"topic"`
 	Value   interface{} `json:"value"`
 	Key     string      `json:"key"`
+	Format  string      `json:"format"`
 }
 
 func publish(w http.ResponseWriter, r *http.Request) {
@@ -117,30 +124,45 @@ func publish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, ok := schemas[e.Subject]
-	if !ok {
-		w.WriteHeader(400)
-		w.Write([]byte(`subject not registered`))
-		return
-	}
+	var encodedValue []byte
 
-	available := false
-	for _, version := range schemas[e.Subject] {
-		if version == e.Version {
-			available = true
-			break
+	if e.Format == FormatJson {
+		encodedValue, err = json.Marshal(e.Value)
+		if err != nil {
+			w.WriteHeader(400)
+			w.Write([]byte(err.Error()))
+			return
 		}
-	}
-	if !available {
-		w.WriteHeader(400)
-		w.Write([]byte(`requested verion not registered in the application`))
-		return
-	}
+	} else if e.Format == FormatAvro {
+		_, ok := schemas[e.Subject]
+		if !ok {
+			w.WriteHeader(400)
+			w.Write([]byte(`subject not registered`))
+			return
+		}
 
-	encodedValue, err := Registry.WithSchema(e.Subject, e.Version).Encode(e.Value)
-	if err != nil {
+		available := false
+		for _, version := range schemas[e.Subject] {
+			if version == e.Version {
+				available = true
+				break
+			}
+		}
+		if !available {
+			w.WriteHeader(400)
+			w.Write([]byte(`requested version not registered in the application`))
+			return
+		}
+
+		encodedValue, err = Registry.WithSchema(e.Subject, e.Version).Encode(e.Value)
+		if err != nil {
+			w.WriteHeader(400)
+			w.Write([]byte(err.Error()))
+			return
+		}
+	} else {
 		w.WriteHeader(400)
-		w.Write([]byte(err.Error()))
+		w.Write([]byte(errors.New("type must be avro or json").Error()))
 		return
 	}
 
@@ -151,8 +173,7 @@ func publish(w http.ResponseWriter, r *http.Request) {
 		Timestamp: time.Now(),
 	})
 
-
-	w.Header().Set("Content-Type","application/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	w.Write([]byte(fmt.Sprintf(`{"partition":%d, "offset":%d}`, p, o)))
 
