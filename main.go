@@ -84,7 +84,7 @@ func main() {
 	config := sarama.NewConfig()
 	config.Producer.Return.Successes = true
 
-	Producer, err = sarama.NewSyncProducer([]string{`localhost:9092`}, config)
+	Producer, err = sarama.NewSyncProducer([]string{`192.168.1.1:9092`}, config)
 	if err != nil {
 		log.Fatal(err)
 	}
