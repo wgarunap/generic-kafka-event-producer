@@ -2,6 +2,7 @@
 
     <HOST>:<PORT>/publish
 
+### Example JSON
 ```json
 {
 	"topic":"test",
@@ -12,6 +13,7 @@
 		"account_id":"123e4567-e89b-12d3-a456-426655440000"
 	},
 	"key": "test",
+    "format": "json",
 	"value": {
 	  "meta": {
 	    "event_id": "123e4567-e89b-12d3-a456-426655440000",
