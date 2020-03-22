@@ -1,3 +1,4 @@
 .idea/*
-generic-publisher
 vendor/**
+generic-kafka-event-producer
+

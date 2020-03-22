@@ -1,10 +1,14 @@
-module github.com/wgarunap/generic-avro-producer
+module generic-kafka-event-producer
 
-go 1.13
+go 1.14
 
 require (
-	github.com/Shopify/sarama v1.23.0
-	github.com/gorilla/mux v1.7.3
-	github.com/pickme-go/log/v2 v2.0.1
-	github.com/pickme-go/schema-registry v0.0.0-20191218123929-447b18708f43
+	github.com/Shopify/sarama v1.26.1
+	github.com/caarlos0/env v3.5.0+incompatible
+	github.com/go-kit/kit v0.9.0
+	github.com/gorilla/mux v1.7.4
+	github.com/tryfix/log v1.0.2
+	github.com/tryfix/metrics v1.0.1
+	github.com/tryfix/schemaregistry v1.0.0
+	github.com/wgarunap/goconf v0.1.0
 )
