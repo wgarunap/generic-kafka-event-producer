@@ -1,7 +1,9 @@
 package http
 
 import (
+	"context"
 	"generic-kafka-event-producer/config"
+	"generic-kafka-event-producer/errors"
 	"generic-kafka-event-producer/http/avro"
 	"generic-kafka-event-producer/http/json"
 	nullpublisher "generic-kafka-event-producer/http/null_publisher"
@@ -10,10 +12,14 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/google/uuid"
+
 	httptransport "github.com/go-kit/kit/transport/http"
 
 	"github.com/gorilla/mux"
 	"github.com/tryfix/log"
+	"github.com/tryfix/metrics"
+	traceable_context "github.com/tryfix/traceable-context"
 )
 
 // Start the http server
@@ -36,6 +42,15 @@ func avroHandler() http.Handler {
 		),
 		avro.DecodeRequest(),
 		avro.EncodeResponse(),
+		httptransport.ServerErrorHandler(
+			errors.NewLogErrorHandler(
+				log.StdLogger,
+				metrics.NoopReporter(),
+			)),
+		httptransport.ServerErrorEncoder(
+			errors.CustomErrEncoder(),
+		),
+		httptransport.ServerBefore(TraceableContext()),
 	)
 }
 func jsonHandler() http.Handler {
@@ -46,6 +61,15 @@ func jsonHandler() http.Handler {
 		),
 		json.DecodeRequest(),
 		json.EncodeResponse(),
+		httptransport.ServerErrorHandler(
+			errors.NewLogErrorHandler(
+				log.StdLogger,
+				metrics.NoopReporter(),
+			)),
+		httptransport.ServerErrorEncoder(
+			errors.CustomErrEncoder(),
+		),
+		httptransport.ServerBefore(TraceableContext()),
 	)
 }
 
@@ -56,5 +80,21 @@ func nullHandler() http.Handler {
 		),
 		nullpublisher.DecodeRequest(),
 		nullpublisher.EncodeResponse(),
+		httptransport.ServerErrorHandler(
+			errors.NewLogErrorHandler(
+				log.StdLogger,
+				metrics.NoopReporter(),
+			)),
+		httptransport.ServerErrorEncoder(
+			errors.CustomErrEncoder(),
+		),
+		httptransport.ServerBefore(TraceableContext()),
 	)
+}
+
+func TraceableContext() httptransport.RequestFunc {
+	return func(i context.Context, request *http.Request) context.Context {
+		u, _ := uuid.NewUUID()
+		return traceable_context.FromContextWithUUID(i, u)
+	}
 }

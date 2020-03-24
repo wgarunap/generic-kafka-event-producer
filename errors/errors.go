@@ -88,16 +88,15 @@ type LogErrorHandler struct {
 }
 
 //NewLogErrorHandler resurn an instance of a LogErrorHandler
-func NewLogErrorHandler(logger log.Logger, metrics metrics.Counter) *LogErrorHandler {
-
+func NewLogErrorHandler(logger log.Logger, reporter metrics.Reporter) *LogErrorHandler {
 	return &LogErrorHandler{
 		logger:  logger,
-		metrics: metrics,
+		metrics: reporter.Counter(metrics.MetricConf{Path: "endpoint_err", Labels: []string{"err"}}),
 	}
 }
 
 func (h *LogErrorHandler) Handle(ctx context.Context, err error) {
-	h.metrics.Count(1, nil)
+	h.metrics.Count(1, map[string]string{"err": err.Error()})
 	h.logger.ErrorContext(ctx, err)
 }
 
