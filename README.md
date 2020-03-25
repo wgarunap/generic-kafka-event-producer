@@ -27,7 +27,7 @@
 ```sh
    <HOST>:<PORT>/publish/avro
 ```
-#### Example Request Payload
+#### Example POST Request Payload
 ```json
 {
    "topic":"test",
@@ -53,7 +53,7 @@
 ```sh
    <HOST>:<PORT>/publish/json
 ```
-#### Example Request Payload
+#### Example POST Request Payload
 ```json
 {
    "topic":"test",
@@ -79,7 +79,7 @@
 ```sh
    <HOST>:<PORT>/publish/null
 ```
-#### Example Request Payload
+#### Example POST Request Payload
 ```json
 {
    "topic":"test",

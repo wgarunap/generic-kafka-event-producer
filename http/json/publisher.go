@@ -50,6 +50,7 @@ func Endpoint(
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		var e = Event{}
 
+		e = request.(Event)
 		var encodedValue []byte
 
 		encodedValue, err = json.Marshal(e.Value)

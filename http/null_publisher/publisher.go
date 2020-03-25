@@ -45,6 +45,8 @@ func Endpoint(
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		var e = Event{}
 
+		e = request.(Event)
+
 		//create headers
 		var headers []sarama.RecordHeader
 		for s, s2 := range e.Headers {
