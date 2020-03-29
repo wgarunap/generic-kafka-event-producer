@@ -1,13 +1,30 @@
 # Generic Kafka Event Producer
 
-### Run On Docker 
+### Overview
+This application will provide REST endpoints to publish kafka messages with following value encodings.
+   - AVRO
+   - JSON
+
+Users can set following parameters in the kafka message.
+   - Topic
+   - Headers(any number of key-value pairs)
+   - Key(kafka message key)
+   - Value(kafka message payload)
+
+### Running the application
+#### Build the docker image
 ```sh 
    docker build -f Dockerfile -t generic-producer .
 ```
 
+#### Pull the repository image
 ```sh
-   docker pull wgarunap/generic-kafka-event-producer:v1.0.0
-   docker run -dit -e SCHEMAREG_URL=http://schemareg.event.com:8081 -e KAFKA_BROKERS=kafka-1:9092,kafka-2:9092 -p 8000:8000 wgarunap/generic-kafka-event-producer:v1.0.0
+   docker pull wgarunap/generic-kafka-event-producer:v1.1.0
+```
+
+#### Run generic event producer
+```sh
+docker run -dit -e SCHEMAREG_URL=http://schemareg.event.com:8081 -e KAFKA_BROKERS=kafka-1:9092,kafka-2:9092 -p 8000:8000 wgarunap/generic-kafka-event-producer:v1.1.0
 ```
 
 ### Configs 
@@ -34,8 +51,8 @@
    "subject":"com.event.EventName",
    "version":2,
    "headers":{
-      "subject":"com.event.EventName",
-      "account_id":"123e4567-e89b-12d3-a456-426655440000"
+      "key1":"value1",
+      "key2":"value2",
    },
    "key":"test",
    "value":{
@@ -57,10 +74,7 @@
 ```json
 {
    "topic":"test",
-   "subject":"com.event.EventName",
-   "version":2,
    "headers":{
-      "subject":"com.event.EventName",
       "account_id":"123e4567-e89b-12d3-a456-426655440000"
    },
    "key":"test",
@@ -90,3 +104,15 @@
    "key":"test",
 }
 ```
+
+
+### TODO
+   - Add Key encoding methods
+   - Add following key/value encoding methods
+      - Binary
+      - String
+      - Protobuf
+      - MessagePack
+   - Add authentication layer
+   - 
+      
