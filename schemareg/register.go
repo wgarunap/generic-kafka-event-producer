@@ -6,6 +6,7 @@ import (
 	"generic-kafka-event-producer/config"
 	"io/ioutil"
 	"net/http"
+	"sync"
 
 	"github.com/tryfix/log"
 	"github.com/tryfix/schemaregistry"
@@ -13,7 +14,8 @@ import (
 
 type subjects []string
 
-var schemas = map[string]struct{}{}
+var schemas = map[string]map[int]struct{}{}
+var mu sync.RWMutex
 
 var reg *schemaregistry.Registry
 
@@ -50,32 +52,85 @@ func RegisterEvents() {
 	}
 
 	for _, subject := range sub {
-		schemas[subject] = struct{}{}
 
-		err := RegisterEvent(subject, int(schemaregistry.VersionAll))
+		var versions []int
+		versions, err := getAllSchemaVersions(subject)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Info(fmt.Sprintf("Registered subject:%s", subject))
+
+		for _, version := range versions {
+			err := registerEvent(subject, version)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
 	}
 }
 
-func RegisterEvent(subject string, version int) error {
-	err := reg.Register(subject, version,
-		func(data []byte) (v interface{}, err error) {
-			return nil, nil
-		})
-	return err
+func registerEvent(subject string, version int) error {
+	if err := reg.Register(subject, version, func(data []byte) (v interface{}, err error) {
+		return nil, nil
+	}); err != nil {
+		return err
+	}
+
+	mu.Lock()
+	_, ok := schemas[subject]
+	if !ok {
+		schemas[subject] = map[int]struct{}{}
+	}
+	schemas[subject][version] = struct{}{}
+	mu.Unlock()
+
+	log.Info(fmt.Sprintf("schema registered, subject:%s, version:%d", subject, version))
+
+	return nil
+}
+
+func getAllSchemaVersions(subject string) (versions []int, err error) {
+	resp, err := http.Get(config.Config.SchemaRegUrl + `/subjects/` + subject + `/versions`)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(body, &versions)
+	if err != nil {
+		return nil, err
+	}
+	return versions, nil
 }
 
 func IsSchemaAvailable(subject string, version int) (bool, error) {
-	_, ok := schemas[subject]
+	mu.RLock()
+	sub, ok := schemas[subject]
+	mu.RUnlock()
 	if !ok {
-		err := RegisterEvent(subject, int(schemaregistry.VersionAll))
+		var versions []int
+		versions, err := getAllSchemaVersions(subject)
 		if err != nil {
 			return false, err
 		}
-		return true, nil
+
+		for _, version := range versions {
+			err := registerEvent(subject, version)
+			if err != nil {
+				return false, err
+			}
+		}
+	}
+
+	_, ok = sub[version]
+	if !ok {
+		err := registerEvent(subject, version)
+		if err != nil {
+			return false, err
+		}
 	}
 
 	return true, nil
