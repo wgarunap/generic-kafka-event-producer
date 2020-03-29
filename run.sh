@@ -11,6 +11,6 @@ fi
 
 echo "starting the application..."
 
-SCHEMAREG_URL=http://35.189.6.187:8081 \
+SCHEMAREG_URL=http://localhost:8081 \
 KAFKA_BROKERS=localhost:9092 \
 ./$binary
