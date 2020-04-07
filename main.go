@@ -2,7 +2,7 @@ package main
 
 import (
 	"generic-kafka-event-producer/config"
-	"generic-kafka-event-producer/http"
+	"generic-kafka-event-producer/httplocal"
 	"generic-kafka-event-producer/producer"
 	"generic-kafka-event-producer/schemareg"
 
@@ -14,11 +14,13 @@ func main() {
 		new(config.Conf),
 	)
 
-	schemareg.Init()
-	schemareg.RegisterEvents()
+	if config.Config.SchemaRegUrl != "" {
+		schemareg.Init()
+		schemareg.RegisterEvents()
+	}
 
 	producer.InitProducer()
 
-	http.Start()
+	httplocal.Start()
 
 }

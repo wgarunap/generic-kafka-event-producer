@@ -12,5 +12,6 @@ require (
 	github.com/tryfix/metrics v1.0.1
 	github.com/tryfix/schemaregistry v1.0.0
 	github.com/tryfix/traceable-context v1.0.1
+	github.com/vmihailenco/msgpack/v4 v4.3.11
 	github.com/wgarunap/goconf v0.1.0
 )
