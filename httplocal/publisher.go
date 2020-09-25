@@ -85,7 +85,10 @@ func EncodeResponse() httptransport.EncodeResponseFunc {
 	return func(context context.Context, writer http.ResponseWriter, response interface{}) error {
 		writer.Header().Set("Content-Type", "application/json")
 		writer.WriteHeader(200)
-		fmt.Fprintf(writer, response.(string))
+
+		// resp, ok := response.(string)
+
+		fmt.Fprintf(writer, `%v`, response)
 		return nil
 	}
 }

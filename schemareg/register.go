@@ -135,3 +135,13 @@ func IsSchemaAvailable(subject string, version int) (bool, error) {
 
 	return true, nil
 }
+
+func GetAllSchemas() (out map[string][]int) {
+	out = map[string][]int{}
+	for s, v := range schemas {
+		for i := range v {
+			out[s] = append(out[s], i)
+		}
+	}
+	return out
+}

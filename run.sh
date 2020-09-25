@@ -2,6 +2,8 @@
 
 binary=generic-kafka-event-producer
 
+rm -rf ${binary}
+
 go build -o $binary
 
 if [[ ! -f $binary ]]; then 
@@ -11,6 +13,6 @@ fi
 
 echo "starting the application..."
 
-SCHEMAREG_URL=http://localhost:8081 \
-KAFKA_BROKERS=localhost:9092 \
+export SCHEMAREG_URL=http://localhost:8081
+export KAFKA_BROKERS=localhost:9092
 ./$binary

@@ -130,6 +130,18 @@ docker run -dit -e SCHEMAREG_URL=http://schemareg.event.com:8081 -e KAFKA_BROKER
 ```
 
 
+### Get Kafka Topic List
+#### Request URL
+```sh
+   curl -XGET "<HOST>:<PORT>/topics"
+```
+
+### Get Schema Reg Subject List
+#### Request URL
+```sh
+   curl -XGET "<HOST>:<PORT>/avrosubjects"
+```
+
 ### TODO
    - Add following key/value encoding methods
       - Protobuf

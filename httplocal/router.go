@@ -4,6 +4,8 @@ import (
 	"context"
 	"generic-kafka-event-producer/config"
 	"generic-kafka-event-producer/errors"
+	"generic-kafka-event-producer/httplocal/schemas"
+	"generic-kafka-event-producer/httplocal/topics"
 	"generic-kafka-event-producer/producer"
 	"generic-kafka-event-producer/schemareg"
 	"net/http"
@@ -23,6 +25,8 @@ import (
 func Start() {
 	router := mux.NewRouter()
 	router.Handle("/publish", avroHandler()).Methods(http.MethodPost)
+	router.Handle("/topics", topicListHandler()).Methods(http.MethodGet)
+	router.Handle("/avrosubjects", schemasListHandler()).Methods(http.MethodGet)
 
 	log.Info("serving now... localhost:" + strconv.Itoa(config.Config.Port))
 
@@ -46,6 +50,38 @@ func avroHandler() http.Handler {
 			errors.CustomErrEncoder(),
 		),
 		httptransport.ServerBefore(TraceableContext()),
+	)
+}
+
+func topicListHandler() http.Handler {
+	return httptransport.NewServer(
+		topics.Endpoint(),
+		topics.DecodeRequest(),
+		topics.EncodeResponse(),
+		httptransport.ServerErrorHandler(
+			errors.NewLogErrorHandler(
+				log.StdLogger,
+				metrics.NoopReporter(),
+			)),
+		httptransport.ServerErrorEncoder(
+			errors.CustomErrEncoder(),
+		),
+	)
+}
+
+func schemasListHandler() http.Handler {
+	return httptransport.NewServer(
+		schemas.Endpoint(),
+		schemas.DecodeRequest(),
+		schemas.EncodeResponse(),
+		httptransport.ServerErrorHandler(
+			errors.NewLogErrorHandler(
+				log.StdLogger,
+				metrics.NoopReporter(),
+			)),
+		httptransport.ServerErrorEncoder(
+			errors.CustomErrEncoder(),
+		),
 	)
 }
 
