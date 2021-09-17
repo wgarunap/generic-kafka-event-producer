@@ -11,6 +11,9 @@ type Conf struct {
 	SchemaRegUrl string   `env:"SCHEMAREG_URL"`
 	Brokers      []string `env:"KAFKA_BROKERS"`
 	Port         int      `env:"PORT" envDefault:"8000"`
+
+	LogLevel log.Level `env:"LOG_LEVEL" envDefault:"INFO"`
+	LogColor bool      `env:"LOG_COLOR" envDefault:"false"`
 }
 
 var Config Conf

@@ -30,18 +30,16 @@ docker run -dit -e SCHEMAREG_URL=http://schemareg.event.com:8081 -e KAFKA_BROKER
 ```
 
 ### Configs 
-```sh
-   // Optional
-   // Schema registry url to fetch the avro event schemas  
-   SCHEMAREG_URL=http://schemareg.event.com:8081
-
-   // Required
-   // kafka brokers list
-   KAFKA_BROKERS=kafka-1,kafka-2,kafka-2
-
-   // Default is 8000
-   // http serving port
-   PORT=8000
+```shell
++---------------+------------+----------+---------+---------------------------------+-----------------------------------------------------+
+|      ENV      | IsRequired | Env Type | Default |             Example             |                     Description                     |
++---------------+------------+----------+---------+---------------------------------+-----------------------------------------------------+
+| SCHEMAREG_URL | Optional   | String   | -       | http://schemareg.event.com:8081 | Schema registry url to fetch the avro event schemas |
+| KAFKA_BROKERS | Required   | []String | -       | kafka-1,kafka-2,kafka-2         | kafka brokers list                                  |
+| PORT          | Optional   | Integer  | 8000    | 8000                            | http serving port                                   |
+| LOG_LEVEL     | Optional   | String   | INFO    | FATAL,WARN,INFO,DEBUG,TRACE     | Application log level                               |
+| LOG_COLOR     | Optional   | Boolean  | false   | false                           | Application log color Enable/Disable                |
++---------------+------------+----------+---------+---------------------------------+-----------------------------------------------------+
 ```
 
 ### Avro Producer 

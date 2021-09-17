@@ -1,11 +1,11 @@
-FROM golang:1.14.0 as builder
+FROM golang:1.16-alpine3.14 AS builder
 
 COPY . /opt/
 WORKDIR /opt/
 
-RUN env GO111MODULE=on GOOS=linux GOARCH=amd64 go build -o generic-kafka-event-producer main.go
+RUN env GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o generic-kafka-event-producer *.go
 
-FROM alpine:3.10
+FROM alpine:3.14.0
 
 RUN apk update && apk add --no-cache \
     ca-certificates \
@@ -16,6 +16,6 @@ ENV TZ=Asia/Colombo
 
 WORKDIR /opt
 
-COPY --from=builder /opt/generic-kafka-event-producer . 
-RUN ls -la
-ENTRYPOINT ["sh", "-c","./generic-kafka-event-producer"]
+COPY --from=builder /opt/generic-kafka-event-producer /opt
+
+ENTRYPOINT ["sh", "-c","/opt/generic-kafka-event-producer"]
