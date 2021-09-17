@@ -21,12 +21,12 @@ Users can set following parameters in the kafka message.
 
 #### Pull the repository image
 ```sh
-   docker pull wgarunap/generic-kafka-event-producer:v1.2.0
+   docker pull wgarunap/generic-kafka-event-producer:v1.3.0
 ```
 
 #### Run generic event producer
 ```sh
-docker run -dit -e SCHEMAREG_URL=http://schemareg.event.com:8081 -e KAFKA_BROKERS=kafka-1:9092,kafka-2:9092 -p 8000:8000 wgarunap/generic-kafka-event-producer:v1.2.0
+docker run -dit -e SCHEMAREG_URL=http://schemareg.event.com:8081 -e KAFKA_BROKERS=kafka-1:9092,kafka-2:9092 -p 8000:8000 wgarunap/generic-kafka-event-producer:v1.3.0
 ```
 
 ### Configs 
