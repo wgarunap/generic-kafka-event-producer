@@ -146,3 +146,7 @@ docker run -dit -e SCHEMAREG_URL=http://schemareg.event.com:8081 -e KAFKA_BROKER
    - Add following key/value encoding methods
       - Protobuf
    - Add authentication layer
+   - Proper error handling and error responses
+   - Imporve documentation about usage on each message encoding type
+   - Github actions implementation to automate testing
+   - write unit tests and integration tests 
