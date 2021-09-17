@@ -5,7 +5,6 @@ import (
 	"generic-kafka-event-producer/httplocal"
 	"generic-kafka-event-producer/producer"
 	"generic-kafka-event-producer/schemareg"
-
 	"github.com/wgarunap/goconf"
 )
 
@@ -19,8 +18,10 @@ func main() {
 		schemareg.RegisterEvents()
 	}
 
+	// initializing the kafka producer
 	producer.InitProducer()
 
+	// blocking call to serve requests
 	httplocal.Start()
 
 }

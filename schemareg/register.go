@@ -26,7 +26,7 @@ func GetRegistry() *schemaregistry.Registry {
 func Init() {
 	r, err := schemaregistry.NewRegistry(config.Config.SchemaRegUrl)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("error initializing schema registry, err:%v", err))
 	}
 	reg = r
 }
@@ -37,18 +37,18 @@ func RegisterEvents() {
 
 	resp, err := http.Get(config.Config.SchemaRegUrl + `/subjects`)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("error calling schema registry subjects endpoint with err:%v", err))
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("error reading schema registry subjects endpoint response body, err:%v", err))
 	}
 
 	sub := subjects{}
 	err = json.Unmarshal(body, &sub)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("error unmarshalling schema registry subjects payload, err:%v", err))
 	}
 
 	for _, subject := range sub {
@@ -56,13 +56,15 @@ func RegisterEvents() {
 		var versions []int
 		versions, err := getAllSchemaVersions(subject)
 		if err != nil {
-			log.Fatal(err)
+			log.Error(fmt.Sprintf("unable to get versions for subject:%s , err:%v", subject, err))
+			continue
 		}
 
 		for _, version := range versions {
 			err := registerEvent(subject, version)
 			if err != nil {
-				log.Fatal(err)
+				log.Error(fmt.Sprintf("unable to register subject:%s version:%v, err:%v", subject, version, err))
+				continue
 			}
 		}
 	}

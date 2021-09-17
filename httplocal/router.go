@@ -2,6 +2,7 @@ package httplocal
 
 import (
 	"context"
+	"fmt"
 	"generic-kafka-event-producer/config"
 	"generic-kafka-event-producer/errors"
 	"generic-kafka-event-producer/httplocal/schemas"
@@ -9,6 +10,8 @@ import (
 	"generic-kafka-event-producer/producer"
 	"generic-kafka-event-producer/schemareg"
 	"net/http"
+	"os"
+	"os/signal"
 	"strconv"
 
 	"github.com/google/uuid"
@@ -28,9 +31,30 @@ func Start() {
 	router.Handle("/topics", topicListHandler()).Methods(http.MethodGet)
 	router.Handle("/avrosubjects", schemasListHandler()).Methods(http.MethodGet)
 
-	log.Info("serving now... localhost:" + strconv.Itoa(config.Config.Port))
+	sig := make(chan os.Signal)
+	signal.Notify(sig, os.Kill, os.Interrupt)
 
-	http.ListenAndServe(`:`+strconv.Itoa(config.Config.Port), router)
+	srv := http.Server{
+		Addr:    `:` + strconv.Itoa(config.Config.Port),
+		Handler: router,
+	}
+
+	go func() {
+		log.Info(`server is starting on port:(` + srv.Addr + ")")
+		err := srv.ListenAndServe()
+		if err != nil {
+			if err != http.ErrServerClosed {
+				log.Error(fmt.Sprintf("error closing the server, err:%v", err))
+			}
+		}
+	}()
+
+	<-sig
+	err := srv.Close()
+	if err != nil {
+		log.Error(fmt.Sprintf("error closing the server, err:%v", err))
+	}
+
 }
 
 func avroHandler() http.Handler {
