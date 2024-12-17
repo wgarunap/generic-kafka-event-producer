@@ -18,7 +18,7 @@ type Conf struct {
 
 var Config Conf
 
-func (*Conf) Register() {
+func (*Conf) Register() error {
 	err := env.Parse(&Config)
 	if err != nil {
 		log.Fatal("error loading schema config, ", err)

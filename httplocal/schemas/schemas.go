@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"generic-kafka-event-producer/schemareg"
-	httptransport "github.com/go-kit/kit/transport/http"
 	"net/http"
 
+	"generic-kafka-event-producer/schemareg"
+
 	"github.com/go-kit/kit/endpoint"
+	httptransport "github.com/go-kit/kit/transport/http"
 )
 
 func DecodeRequest() httptransport.DecodeRequestFunc {

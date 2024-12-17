@@ -54,7 +54,7 @@ func NewDomainError(message string, code int, details string) error {
 	return &err
 }
 
-//ApplicationError is
+// ApplicationError is
 type applicationError struct {
 	msg     string
 	code    int
@@ -81,13 +81,13 @@ func NewAplicationError(message string, code int, details string) error {
 	return &err
 }
 
-//LogErrorHandler v
+// LogErrorHandler v
 type LogErrorHandler struct {
 	logger  log.Logger
 	metrics metrics.Counter
 }
 
-//NewLogErrorHandler resurn an instance of a LogErrorHandler
+// NewLogErrorHandler resurn an instance of a LogErrorHandler
 func NewLogErrorHandler(logger log.Logger, reporter metrics.Reporter) *LogErrorHandler {
 	return &LogErrorHandler{
 		logger:  logger,
@@ -100,7 +100,7 @@ func (h *LogErrorHandler) Handle(ctx context.Context, err error) {
 	h.logger.ErrorContext(ctx, err)
 }
 
-//CustomErrEncoder encoder
+// CustomErrEncoder encoder
 func CustomErrEncoder() httptransport.ErrorEncoder {
 	return func(ctx context.Context, err error, w http.ResponseWriter) {
 

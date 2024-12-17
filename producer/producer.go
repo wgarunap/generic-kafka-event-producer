@@ -1,10 +1,10 @@
 package producer
 
 import (
-	"generic-kafka-event-producer/config"
 	"log"
 
-	"github.com/Shopify/sarama"
+	"generic-kafka-event-producer/config"
+	"github.com/IBM/sarama"
 )
 
 var producer sarama.SyncProducer

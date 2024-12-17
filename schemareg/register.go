@@ -3,10 +3,11 @@ package schemareg
 import (
 	"encoding/json"
 	"fmt"
-	"generic-kafka-event-producer/config"
 	"io/ioutil"
 	"net/http"
 	"sync"
+
+	"generic-kafka-event-producer/config"
 
 	"github.com/tryfix/log"
 	"github.com/tryfix/schemaregistry"

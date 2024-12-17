@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"generic-kafka-event-producer/config"
-	"generic-kafka-event-producer/errors"
-	httptransport "github.com/go-kit/kit/transport/http"
 	"net/http"
 
-	"github.com/Shopify/sarama"
+	"generic-kafka-event-producer/config"
+	"generic-kafka-event-producer/errors"
+
+	"github.com/IBM/sarama"
 	"github.com/go-kit/kit/endpoint"
+	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/tryfix/log"
 )
 

@@ -5,14 +5,18 @@ import (
 	"generic-kafka-event-producer/httplocal"
 	"generic-kafka-event-producer/producer"
 	"generic-kafka-event-producer/schemareg"
+
 	"github.com/tryfix/log"
 	"github.com/wgarunap/goconf"
 )
 
 func main() {
-	goconf.Load(
+	err := goconf.Load(
 		new(config.Conf),
 	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.StdLogger = log.NewLog(
 		log.WithLevel(config.Config.LogLevel),
@@ -29,5 +33,4 @@ func main() {
 
 	// blocking call to serve requests
 	httplocal.Start()
-
 }

@@ -2,7 +2,8 @@ package domain
 
 // Message represent the structure of a single value
 // eg:- key
-//		value
+//
+//	value
 type Message struct {
 	Format  string      `json:"format,omitempty"` //avro,json,string,byte, default byte
 	Subject string      `json:"subject,omitempty"`
@@ -11,7 +12,7 @@ type Message struct {
 	Schema  interface{} `json:"schema,omitempty"`
 }
 
-//Event represent the structure of request message
+// Event represent the structure of request message
 type Event struct {
 	Topic   string            `json:"topic"`
 	Headers map[string]string `json:"headers"`

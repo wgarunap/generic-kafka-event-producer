@@ -4,21 +4,20 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"generic-kafka-event-producer/domain"
-	"generic-kafka-event-producer/errors"
-	"generic-kafka-event-producer/schemareg"
 	"io/ioutil"
 	"net/http"
 	"time"
 
-	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/vmihailenco/msgpack/v4"
+	"generic-kafka-event-producer/domain"
+	"generic-kafka-event-producer/errors"
+	"generic-kafka-event-producer/schemareg"
 
+	"github.com/IBM/sarama"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/tryfix/schemaregistry"
-
-	"github.com/Shopify/sarama"
+	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/tryfix/log"
+	"github.com/tryfix/schemaregistry"
+	"github.com/vmihailenco/msgpack/v4"
 )
 
 func DecodeRequest() httptransport.DecodeRequestFunc {

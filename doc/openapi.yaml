@@ -1,0 +1,202 @@
+openapi: 3.0.1
+info:
+  title: "Generic Kafka Event Producer"
+  description: "http based kafka event producer proxy"
+  version: 1.0.0
+servers:
+  - url: http://localhost:8090
+    description: "local"
+
+paths:
+  /publish:
+    post:
+      tags:
+        - publisher
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/payload"
+            examples:
+              example1:
+                $ref: "#/components/examples/example1"
+              example2:
+                $ref: "#/components/examples/example2"
+              example3:
+                $ref: "#/components/examples/example3"
+              example4:
+                $ref: "#/components/examples/example4"
+
+        required: true
+      responses:
+        2XX:
+          description: "if successfully event published"
+        4XX:
+          description: "on unsuccessful event publish"
+        5XX:
+          description: "internal server error"
+components:
+  schemas:
+    payload:
+      type: object
+      required:
+        - topic
+        - key
+      properties:
+        topic:
+          type: string
+          description: "kafka topic to publish data"
+          example: "trip.v1"
+        headers:
+          type: object
+          description: "kafka headers that needs to be set for the message"
+          additionalProperties:
+            type: string
+          example:
+            key1: "value1"
+            key2: "value2"
+        key:
+          type: object
+          description: "kafka message key"
+          required:
+            - body
+          properties:
+            format:
+              type: string
+              description: "kafka message key format"
+              enum:
+                - string
+                - avro
+                - json
+                - messagepack
+                - bytes
+              default: string
+              example: string
+            version:
+              type: integer
+              description: "kafka message version"
+              minimum: 1
+              example: 1
+            subject:
+              type: string
+              description: "kafka message body encoding subject, only required for avro messages"
+              example: "com.event.EventName"
+            body:
+              nullable: false
+              description: "kafka message key body"
+              oneOf:
+                - type: string
+                  example: "123e4567-e89b-12d3-a456-426655440000"
+                - type: object
+                  example: {
+                    "event_id":"123e4567-e89b-12d3-a456-426655440000"
+                  }
+        value:
+          type: object
+          description: "kafka message body"
+          properties:
+            format:
+              type: string
+              description: "kafka message body format"
+              enum:
+                - string
+                - avro
+                - json
+                - messagepack
+                - bytes
+              default: string
+              example: string
+            version:
+              type: integer
+              description: "kafka message version"
+              minimum: 1
+              example: 1
+            subject:
+              type: string
+              description: "kafka message body encoding subject, only required for avro messages"
+              example: "com.event.EventName"
+            body:
+              description: "kafka message body"
+              nullable: true
+              oneOf:
+                - type: string
+                  example: "123e4567-e89b-12d3-a456-426655440000"
+                - type: object
+                  example: {
+                    "meta": {
+                      "event_id": "123e4567-e89b-12d3-a456-426655440000",
+                      "trace_id": "123e4567-e89b-12d3-a456-426655440000",
+                      "account_id": "123e4567-e89b-12d3-a456-426655440000"
+                    },
+                    "data":{
+                      "amount": "100"
+                    }
+                  }
+  examples:
+    example1:
+      summary: "string message"
+      value:
+        topic: "trip.v1"
+        headers:
+          headerKey1: "headerValue1"
+        key:
+          format: "string"
+          body: "123e4567-e89b-12d3-a456-426655440000"
+        value:
+          format: "string"
+          body: "123e4567-e89b-12d3-a456-426655440000"
+
+    example2:
+      summary: "json message"
+      value:
+        topic: "trip.v1"
+        headers:
+          headerKey1: "headerValue1"
+        key:
+          format: "string"
+          body: "123e4567-e89b-12d3-a456-426655440000"
+        value:
+          format: "json"
+          body: {
+            "meta": {
+              "event_id": "123e4567-e89b-12d3-a456-426655440000",
+              "trace_id": "123e4567-e89b-12d3-a456-426655440000",
+              "account_id": "123e4567-e89b-12d3-a456-426655440000"
+            },
+            "data":{
+               "amount": "100"
+            }
+          }
+    example3:
+      summary: "avro message"
+      value:
+        topic: "trip.v1"
+        headers:
+          headerKey1: "headerValue1"
+        key:
+          format: "string"
+          body: "123e4567-e89b-12d3-a456-426655440000"
+        value:
+          format: "avro"
+          subject: "com.event.EventName"
+          version: "1"
+          body: {
+            "meta": {
+              "event_id": "123e4567-e89b-12d3-a456-426655440000",
+              "trace_id": "123e4567-e89b-12d3-a456-426655440000",
+              "account_id": "123e4567-e89b-12d3-a456-426655440000"
+            },
+            "data": {
+              "amount": "100"
+            }
+          }
+    example4:
+      summary: "null message"
+      value:
+        topic: "trip.v1"
+        headers:
+          headerKey1: "headerValue1"
+        key:
+          format: "string"
+          body: "123e4567-e89b-12d3-a456-426655440000"
+
